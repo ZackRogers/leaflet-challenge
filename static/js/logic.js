@@ -17,17 +17,17 @@ L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     accessToken: API_KEY
 }).addTo(myMap);
 
-function chooseColor(borough) {
-    switch (borough) {
-        case "Brooklyn":
+function chooseColor(depth) {
+    switch (depth) {
+        case depth>90:
             return "yellow";
-        case "Bronx":
+        case depth>70:
             return "red";
-        case "Manhattan":
+        case depth>50:
             return "orange";
-        case "Queens":
+        case depth>30:
             return "green";
-        case "Staten Island":
+        case depth>10:
             return "purple";
         default:
             return "black";
@@ -43,7 +43,7 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_week.geoj
         var depth = obj.geometry.coordinates[2];
         var place = obj.properties.place;
         var mag = obj.properties.mag;
-        L.circle([lat,lng,{radius:mag*10000}]).addTo(myMap)
+        L.circle([lat,lng],{radius:mag*100000,Color:chooseColor(depth)}).bindPopup(`<h4>${place}</h4><h4>Mag: ${mag}</h4>`).addTo(myMap)
     });
 
 });
