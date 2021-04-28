@@ -3,7 +3,7 @@
 // This gets inserted into the div with an id of 'map'
 var myMap = L.map("map", {
     center: [0, -20],
-    zoom: 2
+    zoom: 3
 });
 
 // Adding a tile layer (the background map image) to our map
@@ -18,19 +18,18 @@ L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 }).addTo(myMap);
 
 function chooseColor(depth) {
-    switch (depth) {
-        case depth>90:
+    console.log(depth);
+    switch (true) {
+        case depth > 90:
             return "yellow";
-        case depth>70:
+        case depth > 70:
             return "red";
-        case depth>50:
+        case depth > 50:
             return "orange";
-        case depth>30:
+        case depth > 30:
             return "green";
-        case depth>10:
+        case depth < 31:
             return "purple";
-        default:
-            return "black";
     }
 }
 
@@ -43,7 +42,27 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_week.geoj
         var depth = obj.geometry.coordinates[2];
         var place = obj.properties.place;
         var mag = obj.properties.mag;
-        L.circle([lat,lng],{radius:mag*100000,Color:chooseColor(depth)}).bindPopup(`<h4>${place}</h4><h4>Mag: ${mag}</h4>`).addTo(myMap)
+        L.circle([lat, lng], {
+            radius: mag * 60000,
+            color: 'black',
+            weight: 1,
+            fillColor: chooseColor(depth),
+            fillOpacity: .8
+        }).bindPopup(`<h4>${place}</h4><h4>Mag: ${mag}</h4>`).addTo(myMap)
     });
 
 });
+
+var legend = L.control({ position: 'bottomright' });
+
+legend.onAdd = function () {
+    var div = L.DomUtil.create('div', 'info legend');
+    div.innerHTML = "<span style='background-color:yellow;border:2px solid black;padding:2px'> >90</span>\
+                    <span style='background-color:red;border:2px solid black;padding:2px'> >70</span>\
+                    <span style='background-color:orange;border:2px solid black;padding:2px'> >50</span>\
+                    <span style='background-color:green;border:2px solid black;padding:2px'> >30</span>\
+                    <span style='background-color:purple;border:2px solid black;padding:2px'> <31 </span>"
+    return div;
+};
+
+legend.addTo(myMap)
